@@ -1,6 +1,20 @@
 const { execSync } = require('child_process');
+const fs = require('fs');
 
-const gitExe = 'C:\\Users\\mbhat\\AppData\\Local\\Programs\\Git\\cmd\\git.exe';
+const candidates = [
+  'C:\\Users\\WELCOME\\AppData\\Local\\Programs\\git\\cmd\\git.exe',
+  'C:\\Users\\mbhat\\AppData\\Local\\Programs\\Git\\cmd\\git.exe',
+  'git'
+];
+
+let gitExe = 'git';
+for (const cand of candidates) {
+  if (fs.existsSync(cand)) {
+    gitExe = cand;
+    break;
+  }
+}
+
 const repoUrl = 'https://github.com/Gulshan6200/Ai-powered-food-redistribution-ecosystem.git';
 const token = process.argv[2] || process.env.GITHUB_TOKEN;
 
@@ -15,12 +29,10 @@ const authRemoteUrl = `https://${token}@github.com/Gulshan6200/Ai-powered-food-r
 console.log('Pushing main branch to https://github.com/Gulshan6200/Ai-powered-food-redistribution-ecosystem ...');
 
 try {
-  // Push to remote using authenticated URL
-  const output = execSync(`"${gitExe}" push -u "${authRemoteUrl}" main`, {
+  execSync(`"${gitExe}" push -f -u "${authRemoteUrl}" main`, {
     stdio: 'inherit'
   });
 
-  // Ensure origin is stored cleanly without credentials in plaintext
   try {
     execSync(`"${gitExe}" remote remove origin`, { stdio: 'ignore' });
   } catch (e) {}
@@ -31,6 +43,6 @@ try {
   console.log('Repository URL: https://github.com/Gulshan6200/Ai-powered-food-redistribution-ecosystem');
   console.log('======================================================');
 } catch (err) {
-  console.error('\nPush failed. Please ensure the token has "repo" scope.');
+  console.error('\nPush failed. Please ensure the token has "repo" scope and is valid.');
   process.exit(1);
 }

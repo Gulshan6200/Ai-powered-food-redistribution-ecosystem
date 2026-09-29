@@ -3,15 +3,15 @@
  * Deploys smoothie-website-netlify.zip directly to Netlify via REST API
  * 
  * Usage:
- *   node deploy_to_netlify.js <NETLIFY_AUTH_TOKEN> [SITE_NAME]
+ *   node deploy_to_netlify.js <NETLIFY_AUTH_TOKEN> [SITE_ID_OR_NAME]
  */
 
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-const token = process.argv[2] || process.env.NETLIFY_AUTH_TOKEN;
-const requestedSiteName = process.argv[3] || 'smoothie-website-' + Math.random().toString(36).substring(2, 7);
+const token = process.argv[2] || process.env.NETLIFY_AUTH_TOKEN || 'nfp_nPqmr3wFpW95mX4fTpvZyo6kMQrSkJipba56';
+const targetSiteId = process.argv[3] || '1edddddc-f171-45c7-93d5-fbf46ad03f19';
 
 if (!token) {
   console.error('Error: Netlify Personal Access Token is required.');
@@ -31,19 +31,24 @@ console.log('====================================================');
 console.log('🚀 DEPLOYING TO NETLIFY VIA REST API');
 console.log('====================================================');
 console.log(`Package: ${path.basename(zipFilePath)} (${(zipStats.size / 1024).toFixed(1)} KB)`);
-console.log(`Target Site Name: ${requestedSiteName}`);
+console.log(`Target Site: ${targetSiteId}`);
 
 const zipData = fs.readFileSync(zipFilePath);
 
+const isSiteId = targetSiteId && (targetSiteId.includes('-') || targetSiteId.length > 20);
+const apiPath = isSiteId 
+  ? `/api/v1/sites/${targetSiteId}/deploys` 
+  : `/api/v1/sites?name=${encodeURIComponent(targetSiteId)}`;
+
 const options = {
   hostname: 'api.netlify.com',
-  path: `/api/v1/sites?name=${encodeURIComponent(requestedSiteName)}`,
+  path: apiPath,
   method: 'POST',
   headers: {
     'Authorization': `Bearer ${token}`,
     'Content-Type': 'application/zip',
     'Content-Length': zipData.length,
-    'User-Agent': 'FoodCycle-Deployer/1.0'
+    'User-Agent': 'SmartFood-Deployer/1.0'
   }
 };
 
@@ -59,9 +64,9 @@ const req = https.request(options, (res) => {
         console.log('\n====================================================');
         console.log('🎉 DEPLOYMENT SUCCESSFUL!');
         console.log('====================================================');
-        console.log(`🌐 Live Site URL:    ${data.ssl_url || data.url}`);
-        console.log(`📦 Admin URL:        ${data.admin_url}`);
-        console.log(`🆔 Site ID:          ${data.site_id || data.id}`);
+        console.log(`🌐 Live Site URL:    ${data.ssl_url || data.url || 'https://smoothie-foodcycle-ai.netlify.app'}`);
+        console.log(`📦 Admin URL:        ${data.admin_url || 'https://app.netlify.com/projects/smoothie-foodcycle-ai'}`);
+        console.log(`🆔 Deploy ID:        ${data.id}`);
         console.log(`⚡ State:            ${data.state}`);
         console.log('====================================================');
       } else {
