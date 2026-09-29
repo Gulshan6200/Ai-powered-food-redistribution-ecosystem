@@ -1,0 +1,36 @@
+{
+  "name": "foodcycle-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI-Powered Smart Food Waste Reduction and Sustainable Redistribution Ecosystem",
+  "scripts": {
+    "postinstall": "npm run db:generate",
+    "db:generate": "npx --prefix server prisma generate --schema=../prisma/schema.prisma",
+    "db:push": "npx --prefix server prisma db push --schema=../prisma/schema.prisma",
+    "db:seed": "npm run --prefix server seed",
+    "dev:server": "npm run --prefix server dev",
+    "dev:client": "npm run --prefix client dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "npm run --prefix server build",
+    "build:client": "npm run --prefix client build",
+    "build": "npm run build:server && npm run build:client",
+    "test": "npm run --prefix server test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "prisma": "^6.19.3"
+  },
+  "keywords": [
+    "food-waste",
+    "ai",
+    "sustainability",
+    "smart-redistribution",
+    "iot-monitoring",
+    "esg"
+  ],
+  "author": "FoodCycle AI Team",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.19.3"
+  }
+}

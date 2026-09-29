@@ -1,0 +1,12 @@
+# Netlify Configuration for FoodCycle AI Frontend
+
+[build]
+  base = "client"
+  publish = "dist"
+  command = "npm run build"
+
+# SPA Fallback for React Router
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
